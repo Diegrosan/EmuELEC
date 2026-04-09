@@ -79,7 +79,7 @@ PLATFORM="${PLATFORM%% *}"  # until a space is found
 
 CORE="${arguments##*--core=}"  # read from --core= onwards
 CORE="${CORE%% *}"  # until a space is found
-"${arguments#*--controllers=*}"
+
 EMULATOR="${arguments##*--emulator=}"  # read from --emulator= onwards
 EMULATOR="${EMULATOR%% *}"  # until a space is found
 
