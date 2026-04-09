@@ -58,8 +58,8 @@
 # Space separated list is supported,
 # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
   ADDITIONAL_DRIVERS="gpu-aml openvfd-driver media_modules-aml wifi_dummy-aml ap6xxx-aml
-                     uwe5631-aml RTL8812AU RTL8822BU-aml RTL8822CS-aml RTL8822CU-aml
-                     RTL8852BS-aml RTL8152-aml w1-aml"
+                     uwe5631-aml RTL8852BS-aml RTL8152-aml w1-aml"
+
 
 # Default size of system partition, in MB, eg. 512
   SYSTEM_SIZE=2048
@@ -274,9 +274,7 @@
 LIBRETRO_CORES="2048 \
 81 \
 a5200 \
-arduous \
 atari800 \
-b2 \
 beetle-lynx \
 beetle-ngp \
 beetle-pce \
@@ -288,21 +286,16 @@ bk \
 bluemsx \
 cannonball \
 cap32 \
-clownmdemu \
 daphne \
-dice \
 dinothawr \
 dosbox-svn \
 easyrpg \
-emuscv \
-ep128emu \
 fake_08 \
 fbalpha2012 \
 fbneo \
 fceumm \
 fceumm-mod \
 flycast \
-freechaf \
 freeintv \
 fuse-libretro \
 gambatte \
@@ -320,16 +313,10 @@ gpsp \
 gw-libretro \
 handy \
 hatari \
-jaxe \
-jollycv \
-lowresnx \
-m2000 \
 mame2003-plus \
 mame2010 \
 meowpc98 \
 mgba \
-minivmac \
-mojozork \
 mrboom \
 mupen64plus \
 neocd_libretro \
@@ -359,7 +346,6 @@ spring \
 stella \
 supafaust \
 tgbdual \
-theodore \
 tic-80 \
 tyrquake \
 xrick \
@@ -369,8 +355,6 @@ vba-next \
 vbam \
 vecx \
 vice \
-vircon32 \
-wasm4 \
 yabasanshiro"
 
 LIBRETRO_EXTRA_CORES="chailove \

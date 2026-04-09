@@ -79,13 +79,21 @@ PLATFORM="${PLATFORM%% *}"  # until a space is found
 
 CORE="${arguments##*--core=}"  # read from --core= onwards
 CORE="${CORE%% *}"  # until a space is found
-
+"${arguments#*--controllers=*}"
 EMULATOR="${arguments##*--emulator=}"  # read from --emulator= onwards
 EMULATOR="${EMULATOR%% *}"  # until a space is found
+
+P1_INDEX="${arguments##*-p1index }"  # read from --p1index= onwards
+P1_INDEX="${P1_INDEX%% *}"  # until a space is found
+
+P1_GUID="${arguments##*-p1guid }"  # read from --p1guid= onwards
+P1_GUID="${P1_GUID%% *}"  # until a space is found
 
 ROMNAME="${1}"
 BASEROMNAME="${ROMNAME##*/}"
 GAMEFOLDER="${ROMNAME//${BASEROMNAME}}"
+
+systemctl stop emustation.service
 
 KILLTHIS="none"
 KILLSIGNAL="15"
@@ -114,6 +122,18 @@ if [[ "${EMULATOR}" = "retrorun" ]]; then
     EMU="${CORE}_libretro"
     RETRORUN="yes"
     LIBRETRO=""
+fi
+
+
+#RA PRIORITY CORES
+if [[ "${EMULATOR}" = "libretro" ]] || [[ "${EMULATOR}" = "retrorun" ]]; then
+    if [[ -f "/tmp/cores/${EMU}.so" ]]; then
+        DIRCORES="/tmp/cores"
+    elif [[ -f "/storage/cores/${EMU}.so" ]]; then
+        DIRCORES="/storage/cores"
+    else
+        DIRCORES="/usr/lib/libretro" # fallback
+    fi
 fi
 
 ROTATION_OUTPUT=$(get_ee_setting "${EMULATOR}.rotation_output" "${PLATFORM}" "${BASEROMNAME}")
@@ -314,9 +334,15 @@ case ${PLATFORM} in
             RUNTHIS='${TBASH} ppsspp.sh "${ROMNAME}"'
                 fi
                 ;;
+        "3ds")
+                if [ "${EMU}" = "azahar_sa" ]; then
+            set_kill_keys "azahar_sa"
+            RUNTHIS='${TBASH} azahar.sh "${ROMNAME}" "${P1_INDEX}:${P1_GUID}"'
+                fi
+                ;;
         "neocd")
                 if [ "${EMU}" = "fbneo" ]; then
-            RUNTHIS='${RABIN} ${VERBOSE} -L /tmp/cores/fbneo_libretro.so --subsystem neocd --config ${RACONF} "${ROMNAME}"'
+            RUNTHIS='${RABIN} ${VERBOSE} -L ${DIRCORES}/fbneo_libretro.so --subsystem neocd --config ${RACONF} "${ROMNAME}"'
                 elif [ "${EMU}" = "FbneoSA" ]; then
             set_kill_keys "fbneo"
             RUNTHIS='fbneo.sh "${ROMNAME}" NCD'
@@ -437,7 +463,7 @@ if [ -s "/emuelec/configs/RA_ARGS" ]; then
 	RA_ARGS = $(cat "/emuelec/configs/RA_ARGS")
 fi
 
-RUNTHIS='${RABIN} ${VERBOSE} ${RA_ARGS} -L /tmp/cores/${EMU}.so --config ${RACONF} "${ROMNAME}"'
+RUNTHIS='${RABIN} ${VERBOSE} ${RA_ARGS} -L ${DIRCORES}/${EMU}.so --config ${RACONF} "${ROMNAME}"'
 CONTROLLERCONFIG="${arguments#*--controllers=*}"
 
 if [[ "${arguments}" == *"-state_slot"* ]]; then
@@ -533,7 +559,7 @@ else # Retrorun was selected
             ln -s /dev/input/event2 ${JOY_FILE}
     fi
 
-    RUNTHIS+=' ${CMD_ROTATE} --triggers -g -d /storage/roms/bios /tmp/cores/${EMU}.so "${ROMNAME}"'
+    RUNTHIS+=' ${CMD_ROTATE} --triggers -g -d /storage/roms/bios ${DIRCORES}/${EMU}.so "${ROMNAME}"'
 
 fi # end Libretro/retrorun or standalone emu logic
 
@@ -644,6 +670,7 @@ esac
 [[ "${CLOUD_SYNC}" == "1" ]] && wait ${CLOUD_PID}
 
 end_game
+systemctl start emustation.service &
 
 if [ "$EMU" = "mednafen_supafaust_libretro" ]; then
 		emuelec-utils small-cores disable
